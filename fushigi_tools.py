@@ -8,8 +8,6 @@ log.basicConfig(level=log.INFO) # change to warning when finished
 
 # Config
 
-# Commented out for testing
-
 argparser = argparse.ArgumentParser(description='Tools for ふしぎ電車 archive files')
 argparser.add_argument('command', help='command to perform on the targets',
                        choices=['format', 'metadata', 'unpack', 'repack'])
