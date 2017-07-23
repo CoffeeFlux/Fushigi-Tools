@@ -1,3 +1,3 @@
 # Fushigi Tools
 
-Translation for ふしぎ電車, a weird old doujin denpa nukige
+Translation tools for ふしぎ電車, a weird old doujin denpa nukige
