@@ -16,8 +16,10 @@ def get_extension(data):
         # TGA has its identifier in the footer >_>
         if fingerprint in file_fingerprint_table:
             return file_fingerprint_table[fingerprint]
-        else:
+        elif length > 18 and data[-18:-2].decode('utf-8') == 'TRUEVISION-XFILE':
             return 'tga'
+        else:
+            return 'nul'
     return 'nul'
 
 # This can probably cleaned up, but currently I'm just implementing off the asm
