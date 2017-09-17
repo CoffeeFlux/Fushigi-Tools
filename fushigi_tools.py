@@ -6,6 +6,8 @@ from fushigi import *
 
 log.basicConfig(level=log.INFO) # change to warning when finished
 
+# Some of the variable naming in this is a bit fucky, since I didn't initially realize that Him5 included a hashmap
+
 # Config
 
 argparser = argparse.ArgumentParser(description='Tools for ふしぎ電車 archive files')
@@ -33,8 +35,8 @@ def process_file(file_path):
                 print('File Format:', file_format)
             elif command == 'metadata':
                 util.print_list(metadata)
-            elif command in 'unpack':
-                asset_dir = os.path.join(args.output, basename)
+            elif command == 'unpack':
+                asset_dir = os.path.join(args.output, basename + ';' + file_format)
                 util.ensure_dir_exists(asset_dir)
 
                 if len(os.listdir(asset_dir)) > 0:
@@ -44,7 +46,41 @@ def process_file(file_path):
                     else:
                         return
 
-                # folder creation and file unpacking
+                if file_format == 'Him4':
+                    for index, offset in enumerate(metadata):
+                        unpacker.him4(offset, main_file, asset_dir, index)
+                elif file_format == 'Him5':
+                    for folder in metadata:
+                        for file in folder['files']:
+                            unpacker.him5(file, main_file, asset_dir)
+
+    else:
+        log.error('unsupported extension: %s', extension)
+        return
+
+def process_folder(path):
+    # this is gross and bad i'm sorry
+    input_dir, basename = os.path.split(path[:-1])
+    filename, file_format = basename.split(';')
+    name, extension = os.path.splitext(filename)
+
+    if extension == '.HXP':
+        print('Processing: ' + basename)
+
+        output_path = os.path.join(args.output, filename)
+        if os.path.exists(output_path):
+            response = input('File %s already exists. Remove and re-pack? (y/N)'.format(output_path))
+            if response.lower() in ('y', 'no'):
+                os.remove(output_path)
+            else:
+                return
+
+        contents = sorted([os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
+
+        if file_format == 'Him4':
+            repacker.him4(contents, output_path)
+        else:
+            repacker.him5(contents, output_path)
 
     else:
         log.error('unsupported extension: %s', extension)
@@ -56,8 +92,14 @@ for path in args.files:
     if not (is_file or is_dir):
         log.warn('%s does not exist; skipping', path)
     elif is_file:
-        process_file(path)
+        if args.command in ('format', 'metadata', 'unpack'):
+            process_file(path)
+        else:
+            log.error('%s is a file; please specify a directory to repack')
     else: # is_dir
-        files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-        for filename in files:
-            process_file(filename)
+        if args.command in ('format', 'metadata', 'unpack'):
+            files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+            for filename in files:
+                process_file(filename)
+        else:
+            process_folder(path)
