@@ -2,6 +2,8 @@ import os, png, io
 from .util import * # in package
 import logging as log
 
+BUCKET_SIZE = 32
+
 def hash(filename, divisor):
 	result = 0
 	i = 1
@@ -38,12 +40,64 @@ def him4(files, output):
 # This is awful and bad and I should probably try to clean it up
 def him5(files, output):
 	hashmap = {}
+	hash_offsets = {}
+	metadata_base = 8
 	for file in files:
 		basename = os.path.split(file)[1]
 		name, extension = os.path.splitext(basename)
-		namehash = hash(name, 32)
+
+		namehash = hash(name, BUCKET_SIZE)
 		if not namehash in hashmap:
 			hashmap[namehash] = []
 		hashmap[namehash].append(file)
 
-	print_dict(hashmap)
+	# Sort the groupings for each hash
+	for key in hashmap.keys():
+		hashmap[key] = sorted(hashmap[key])
+
+	with open(output, 'wb') as f:
+		# Write header, bucket size, and offset section for hashmap
+		f.write('Him5'.encode('utf-8'))
+		write_int(len(files), f)
+		f.seek(metadata_base + 8 * BUCKET_SIZE)
+
+		# Write entries for each key in the hashmap
+		for hash_value in range(BUCKET_SIZE):
+			entries = hashmap.get(hash_value, [])
+			hash_start_pos = f.tell()
+			for file in entries:
+				basename = os.path.split(file)[1]
+				name, extension = os.path.splitext(basename)
+				write_byte(len(name) + 6, f)
+				hash_offsets[name] = f.tell()
+				write_null(4, f) # to fill in later
+				write_null_term_string(name, f)
+			if len(entries):
+				write_null(1, f)
+			hash_end_pos = f.tell()
+
+			# Go back and fill in the offset section
+			f.seek(metadata_base + 8 * hash_value)
+			write_int(hash_end_pos - hash_start_pos, f)
+			write_int(hash_start_pos, f)
+			f.seek(hash_end_pos)
+
+		# Write the actual data
+		for hash_value in sorted(hashmap):
+			entries = hashmap[hash_value]
+			for file in entries:
+				basename = os.path.split(file)[1]
+				name, extension = os.path.splitext(basename)
+
+				# Go back and write the offset in the hash table
+				data_start_pos = f.tell()
+				f.seek(hash_offsets[name])
+				write(data_start_pos, '>I', f)
+				f.seek(data_start_pos)
+
+				# Write data lengths and raw data
+				write_null(4, f) # data is uncompressed
+				with open(file, 'rb') as source:
+					data = source.read()
+				write_int(len(data), f)
+				f.write(data)

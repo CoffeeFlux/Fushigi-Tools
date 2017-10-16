@@ -8,7 +8,7 @@ def file_info(file_handler):
     log.info('file format start: 0x%08X', f.tell())
     file_format = f.read(4).decode('shift_jis')
     log.debug('file format: %s', file_format)
-    folder_count = read_int(f) # this isn't actually folders with Him4, but i'm leaving the name
+    folder_count = read_int(f) # in hindsight this is a terrible name, but i cba to change it
     log.debug('folder count: %s', folder_count)
 
     if file_format == 'Him4':
@@ -40,7 +40,7 @@ def file_info(file_handler):
                 data = read_chunk(folder['offset'], folder_size, f)
                 while data.tell() < folder_size - 1:
                     folder['files'].append({
-                        'filename_length': read_byte(data), # except not actually! it's this value -6 or something
+                        'filename_length': read_byte(data), # except not actually! it's this value -6, not including the null byte
                         'offset': read('>I', 4, data), # big endian because why the fuck not
                         'filename': read_null_term_string(data)
                     })

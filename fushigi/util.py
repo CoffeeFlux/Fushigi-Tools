@@ -65,13 +65,16 @@ def write_short(value, file_handler):
 def write_bool(value, file_handler):
     write(value, '<?', file_handler)
 
+def write_null(quantity, file_handler):
+    file_handler.write(b'\x00' * quantity)
+
 def write_null_term(value, file_handler):
-    file_handler.write(value)
-    file_handler.write('\0')
+    file_handler.write(value) # Has to be a bytes object, obviously
+    write_null(1, file_handler)
 
 def write_null_term_string(value, file_handler):
     file_handler.write(value.encode(char_encoding))
-    file_handler.write('\0')
+    write_null(1, file_handler)
 
 def write_string(value, file_handler):
     encoded = value.encode(char_encoding)

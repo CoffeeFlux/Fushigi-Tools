@@ -153,7 +153,6 @@ def him5(header, file_handler, folder_dir):
     f.seek(header['offset'])
     header['compressed_size'] = read_int(f)
     header['original_size'] = read_int(f)
-    #header['file_type'] = read_byte(f)
 
     if header['compressed_size'] > 0:
         raw_data = f.read(header['compressed_size'])
