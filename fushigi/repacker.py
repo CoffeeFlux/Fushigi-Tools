@@ -58,7 +58,7 @@ def him5(files, output):
 	with open(output, 'wb') as f:
 		# Write header, bucket size, and offset section for hashmap
 		f.write('Him5'.encode('utf-8'))
-		write_int(len(files), f)
+		write_int(BUCKET_SIZE, f)
 		f.seek(metadata_base + 8 * BUCKET_SIZE)
 
 		# Write entries for each key in the hashmap
