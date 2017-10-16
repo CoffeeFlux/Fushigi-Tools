@@ -138,7 +138,7 @@ def him4(offset, file_handler, asset_dir, file_id):
     else:
         data = f.read(original_size)
 
-    log.info('Unpacking ' + str(file_id))
+    log.info('Unpacking: ' + str(file_id))
     log.debug('offset: %s, asset_dir: %s, file_id: %s, compressed_size: %s, original_size: %s',
         offset, asset_dir, file_id, compressed_size, original_size)
 
@@ -160,7 +160,7 @@ def him5(header, file_handler, folder_dir):
     else:
         data = f.read(header['original_size'])
 
-    log.info('Unpacking ' + header['filename'])
+    log.info('Unpacking: ' + header['filename'])
     log.debug('Header: %s', header)
 
     extension = get_extension(data)

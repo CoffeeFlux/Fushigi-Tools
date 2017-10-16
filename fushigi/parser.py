@@ -5,14 +5,14 @@ def file_info(file_handler):
     f = file_handler
 
     # Format
-    log.info('file format start: 0x%08X', f.tell())
+    log.debug('file format start: 0x%08X', f.tell())
     file_format = f.read(4).decode('shift_jis')
     log.debug('file format: %s', file_format)
     folder_count = read_int(f) # in hindsight this is a terrible name, but i cba to change it
     log.debug('folder count: %s', folder_count)
 
     if file_format == 'Him4':
-        log.info('files start: 0x%08X', f.tell())
+        log.debug('files start: 0x%08X', f.tell())
         files = []
         for i in range(folder_count):
             files.append(read_int(f))
@@ -22,7 +22,7 @@ def file_info(file_handler):
 
     elif file_format == 'Him5':
         # Folders
-        log.info('folders start: 0x%08X', f.tell())
+        log.debug('folders start: 0x%08X', f.tell())
         folders = []
         for i in range(folder_count):
             folders.append({
@@ -33,7 +33,7 @@ def file_info(file_handler):
         log.debug('folders: %s', folders)
 
         # Files
-        log.info('files start: 0x%08X', f.tell())
+        log.debug('files start: 0x%08X', f.tell())
         for folder in folders:
             folder_size = folder['size']
             if folder_size > 0:

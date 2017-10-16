@@ -21,9 +21,11 @@ def him4(files, output):
 
 		file_offset_pos = f.tell()
 		file_data_pos = file_offset_pos + 4*len(files)
+		log.debug('file offsets: %s, file data: %s', file_offset_pos, file_data_pos)
 
 		# Hopefully the files are sorted!
 		for file in files:
+			log.debug('packing file: ' + file)
 			with open(file, 'rb') as source:
 				data = source.read()
 
@@ -41,7 +43,7 @@ def him4(files, output):
 def him5(files, output):
 	hashmap = {}
 	hash_offsets = {}
-	metadata_base = 8
+	metadata_base = 8 # preceded by fingerprint and bucket size
 	for file in files:
 		basename = os.path.split(file)[1]
 		name, extension = os.path.splitext(basename)
@@ -54,6 +56,7 @@ def him5(files, output):
 	# Sort the groupings for each hash
 	for key in hashmap.keys():
 		hashmap[key] = sorted(hashmap[key])
+	log.debug('hashes: %s', hashmap)
 
 	with open(output, 'wb') as f:
 		# Write header, bucket size, and offset section for hashmap
@@ -81,6 +84,7 @@ def him5(files, output):
 			write_int(hash_end_pos - hash_start_pos, f)
 			write_int(hash_start_pos, f)
 			f.seek(hash_end_pos)
+		log.debug('hash offsets: %s', hash_offsets)
 
 		# Write the actual data
 		for hash_value in sorted(hashmap):

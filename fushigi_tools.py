@@ -4,7 +4,7 @@ import argparse, os
 import logging as log
 from fushigi import *
 
-log.basicConfig(level=log.INFO) # change to warning when finished
+log.basicConfig(level=log.WARNING) # change to warning when finished
 
 # Some of the variable naming in this is a bit fucky, since I didn't initially realize that Him5 included a hashmap
 
@@ -21,6 +21,7 @@ args = argparser.parse_args()
 # Body
 
 def process_file(file_path):
+    log.info('Processing file: ' + file_path)
     basename = os.path.basename(file_path)
     name, extension = os.path.splitext(basename)
 
@@ -59,6 +60,7 @@ def process_file(file_path):
         return
 
 def process_folder(path):
+    log.info('Processing folder: ' + path)
     # this is gross and bad i'm sorry
     input_dir, basename = os.path.split(path[:-1])
     filename, file_format = basename.split(';')
