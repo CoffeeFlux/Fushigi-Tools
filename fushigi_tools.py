@@ -25,7 +25,7 @@ def process_file(file_path):
     basename = os.path.basename(file_path)
     name, extension = os.path.splitext(basename)
 
-    if extension == '.HXP':
+    if extension.upper() == '.HXP':
         print('Processing: ' + basename)
 
         with open(file_path, 'rb') as main_file:
