@@ -15,7 +15,7 @@ The command can either be:
 * format - lists the file format (Him4 and Him5 supported)
 * metadata - lists metadata regarding the files
 * unpack - dumps archived files into a subdirectory
-* repack - NONFUNCTIONAL - takes a folder and repacks its assets
+* repack - takes a folder and repacks its assets
 
 The target can be a single or series of files or folders. If a folder is specified, the program will attempt to extract every .HXP file within it.
 
