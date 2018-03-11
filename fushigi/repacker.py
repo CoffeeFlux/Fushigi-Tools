@@ -4,7 +4,7 @@ import logging as log
 
 BUCKET_SIZE = 32
 
-def hash(filename, divisor):
+def bad_hash(filename, divisor):
 	result = 0
 	i = 1
 
@@ -48,7 +48,7 @@ def him5(files, output):
 		basename = os.path.split(file)[1]
 		name, extension = os.path.splitext(basename)
 
-		namehash = hash(name, BUCKET_SIZE)
+		namehash = bad_hash(name, BUCKET_SIZE)
 		if not namehash in hashmap:
 			hashmap[namehash] = []
 		hashmap[namehash].append(file)
